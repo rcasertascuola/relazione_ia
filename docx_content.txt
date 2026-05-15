@@ -1,0 +1,228 @@
+ Intelligenza Artificiale relazione 1
+___________________________________________________________________________
+_
+Titolo: Analisi Esplorativa del Dataset [11_Dataset Utilizzo Piattaforme Streaming]
+Autore: [Marco Lo Cascio]
+Corso: [Intelligenza Artificiale 5H]
+Data: [14/01/2026]
+___________________________________________________________________________
+_
+1. Introduzione e Obiettivi
+In questa relazione di analisi esplorativa del dataset [11_Dataset Utilizzo Piattaforme Streaming], dato in formato “.csv”, contenente informazioni su come le persone visualizzano i contenuti in streaming vengono messi come obiettivi i seguenti:
+
+Obiettivi dell’analisi:
+Scoprire la percentuale della tipologia di contenuto più visto su ogni piattaforma
+Vedere la tipologia di contenuto più visto in famiglia
+Confrontare se le persone che guardano contenuti da sole tendono a spendere molte più ore se si hanno più abbonamenti
+Fornire un’analisi chiara tramite elementi grafici, dei punti sopra citati
+
+
+Breve descrizione del Dataset
+Il dataset in questione è formato da 1000 righe e 13 colonne, di cui 10 colonne con dati numerici e 3 colonne con dati categorici.
+
+
+A loro volte le colonne categoriche contengono le seguenti livelli
+
+
+2. Data Cleaning
+Un primo sguardo ai dati tramite  display(df.head()) display(df.info())  successivamente approfondito con  print(df.head(100).to_string())
+rilevano anomalie nei dati. Sono presenti errori come “-999” e mancanza di dati come “Nan, ***”, rendendo necessaria una fase di pulizia prima di passare all’analisi.
+
+2.1 Correzione tipi di dati
+Problema: La colonna [numero_abbonamenti] è di tipo float64
+Soluzione: Considerando che non è possibile avere un numero decimale di iscrizioni alle piattaforme, si decide di convertire la colonna in tipo int64
+
+
+
+2.2 Verifica dei duplicati
+Ipotesi: é possibile che nel dataset ci siano dei duplicati
+Soluzione: utilizzando il comando [duplicate().sum()] sul dataset è possibile verificare se sono presenti duplicati
+duplicate_rows = df_clear.duplicated().sum()
+print(f"Numero di righe duplicate in df_clear: {duplicate_rows}")
+Numero di righe duplicate in df_clear: 0
+Soluzione: Verificando non sono presenti duplicati
+
+2.3 Esclusione degli outliers
+Problema: Nel dataset sono presenti record con numero_abbonamenti 0
+Soluzione: Si è deciso di filtrare il dataset solo per abbonamenti >= 1, perchè record con numero_abbonamenti uguale a zero sono stati considerati incostistenti.
+
+2.4 Gestione dati mancanti
+Problema: Viene notata una certa corrispondenza tra le colonne categoriche e le rispettive colonne numeriche con denominazione uguale se non viene considerato “_label”, questo porta a pensare che ad ogni livello delle colonne categoriche sia abbinato un numero
+
+
+
+Soluzione: Viene fatta una mappatura delle combinazioni uniche per ogni colonna categorica con la rispettiva colonna numerica, in questo risultato viene presa la categoria della piattaforma preferito come esempio.
+
+Dalla mappatura si evince che la teoria precedente sul fatto che ad ogni piattaforma preferita corrispondesse un id, si verifica vera la grande quantità di volte che vengono ripetuti i valori.
+
+Da questa analisi si decide che questi sono i corrispettivi id:
+
+
+
+
+
+
+
+
+
+Dopo la correzione dei dati viene fatta una seconda mappatura per vedere la quantità effettiva senza dati mancanti, dove i valori risultavano essere per entrambe le colonne mancanti, quei record sono stati ritenuti inconsistenti quindi eliminati.
+
+2.4.1 Correzione dati mancanti per ore_settimanali_streaming e durata_media_visione
+
+Problema: Risultano dei dati mancanti nelle colonne [ore_settimanali_streaming], [durata_media_visione]
+
+
+Soluzione: Considerando il punto 3 nella sezione obiettivi dell’analisi, si decide di proseguire nella seguente maniera. Per riempire i dati mancanti della colonna [ore_settimanali_streaming]si filtra una prima volta il dataset per prendere in esame i record con modalità visione “Solo”, poi si filtra una seconda volta per ogni valore unico nella tabella [numero abbonamenti], si calcola la mediana di [ore_settimanali_streaming]su ogni dataset filtrato e la si sostituisce ai valori mancanti dello stesso. Dopo aver fatto l’analisi di questi dati come descritto nel punto tre sezione obiettivi, questo filtraggio sarà scartato, e verrà presa in esame tutta la colonna del dataset intero “df_clear” qui verrà usato lo stesso approccio della mediana per tutto il dataset, la scelta dell’utilizzo della mediana è dovuto all'esclusione volontaria di identificare gli outliers per queste colonne.
+
+	Per [durata_media_visione] anch'essa viene gestita con la mediana
+
+
+
+
+3 Analisi
+3.1 Obbiettivo 1
+	Per arrivare al completamento dell'obiettivo 1 viene filtrato il dataset tenendo in considerazione solo le colonne [piattaforma_preferita_label] [tipo_contenuti_label]  di queste vengono eliminati i record con valori NaN, ed in seguito viene fatta una mappatura per il tipo di contenuto visto su ogni piattaforma
+ i risultati risultano essere evidenti dal grafico e corrispondono ai seguenti
+
+
+
+
+
+
+3.2 Obbiettivo 2
+Anche in questo caso come adottato nell'obiettivo 1, viene filtrato il dataset per  modalita_visione = famiglia, viene fatta una mappatura e viene sommata la quantità di visualizzazioni del tipo di contenuto tra tutte le piattaforme. Guardando il grafico possiamo notare che il contenuto più visto dalle famiglie risultano essere i documentari con 102 visualizzazioni
+
+
+
+
+
+
+3.3 Obbiettivo 3
+Iniziamo con un filtraggio del dataset di solo i record con modalita_visione = Solo
+Di questi riportandoli su un grafico scatter. Possiamo notare di come la nostra teoria sia corretta, con un numero maggiore di abbonamenti le persone che guardano contenuti da sole tendono a spendere più ore rispetto a chi ne ha di meno.
+
+Percentuale di aumento delle ore settimanali di streaming:
+Da 1 a 2 abbonamenti: 22.37%
+Da 2 a 3 abbonamenti: 14.90%
+Da 3 a 4 abbonamenti: -3.78%
+
+
+3.4 Gruppi
+Nel dataset è presente una colonna Y, che dispone di due etichette uniche “0” e “1”, questo fa riflettere sul fatto che potrebbero esistere due gruppi distinti. Per trovare questa teoria viene disposto un grafico che ha per asse delle y le [ore_settimanali_streaming], per l’asse delle x [durata_media_visione]. I punti che usciranno dalla seguente combinazione di valori sarà a sua volta colorata se avente y uguale a 0 o 1.
+
+Osservando il grafico che ne esce fuori, si può notare come la scelta volontaria di lasciare gli outlier faccia risultare il grafico con punti sparsi dall’area centrale dove sono concentrati i dati. Tralasciando questo particolare se consideriamo il valore di Y come gruppo 0 e gruppo 1, possiamo notare anche se con poca certezza, che il gruppo 0 tende a concentrarsi maggiormente nella parte alta-destra del grafico, così facendo capire che il gruppo 0 spende più tempo nelle piattaforme di streaming. Mentre il gruppo 1 l’opposto concentrandosi nella parte bassa-sinistra del grafico
+
+
+4 Addestramento e Confronto di Reti Neurali
+4.1 Sommario esecutivo
+Il presente lavoro affronta un problema di classificazione binaria sulla variabile target Y, costruita a partire da un dataset relativo alle abitudini di consumo di servizi di streaming video. L'obiettivo è confrontare 34 configurazioni di reti neurali fully-connected, identificare il modello con le migliori prestazioni sul test set e ricavare un insieme di linee guida riutilizzabili per problemi analoghi.
+Risultati principali. L'esperimento ha prodotto un modello Champion “Modello 26” che raggiunge un'accuratezza sul test set del 92.86% con una perdita pari 70.61%. L'analisi per gruppi mostra che (i) la standardizzazione delle feature numeriche è la singola modifica con maggiore impatto positivo sulle prestazioni; (ii) l'aggiunta di hidden layer oltre i 2-3 strati non porta benefici e in alcuni casi degrada il modello; (iii) la scelta della funzione di attivazione sullo strato di output è cruciale: i modelli che la sbagliano sono i peggiori in classifica.
+4.2 Contesto e obiettivi
+Il dataset df_final_clear.csv contiene osservazioni su utenti di piattaforme di streaming e include feature numeriche (ore settimanali di streaming, numero di abbonamenti, durata media di visione, film e serie viste, giorni d'uso settimanale) e categoriche già codificate (piattaforma preferita, tipo di contenuti, modalità di visione). La variabile target Y assume valori 0/1 e identifica una categoria di comportamento dell'utente.
+L'obiettivo del lavoro è duplice:
+addestrare un insieme sufficientemente ampio di reti neurali per esplorare lo spazio delle iperarchitetture (profondità, numero di neuroni, funzioni di attivazione, batch size, epoche, preprocessing);
+identificare, motivare e validare il modello Champion sulla base di metriche di test e considerazioni di overfitting.
+L'approccio adottato è quello di una hyperparameter exploration manuale strutturata in gruppi tematici, in modo da poter attribuire ogni variazione di performance a una specifica scelta progettuale e non al rumore.
+4.3 Setup sperimentale
+4.3.1 Preprocessing dei dati
+Sono state eliminate le colonne di tipo object (testuali) preservando soltanto le feature numeriche e quelle già codificate come interi. Le righe con valori mancanti sono state scartate tramite dropna(). Il target Y è stato separato dalle feature.
+Per i modelli da 1 a 20 le feature sono state usate nella loro scala originale. Per i modelli da 21 a 34 è stata applicata una standardizzazione z-score (sottrazione della media e divisione per la deviazione standard, colonna per colonna), in modo da poter isolare l'effetto di questa trasformazione sulle prestazioni.
+4.3.2 Split del dataset
+Il dataset è stato suddiviso in tre partizioni mediante due chiamate consecutive a train_test_split:
+Train: 70% delle osservazioni, usato per l'aggiornamento dei pesi.
+Validation: 15% delle osservazioni, usato per monitorare la generalizzazione epoca per epoca.
+Test: 15% delle osservazioni, usato esclusivamente per la valutazione finale e mai durante il training.
+Lo split è stato effettuato con random_state=42 per garantire la riproducibilità, e con stratificazione su Y per mantenere la stessa distribuzione di classi nelle tre partizioni.
+4.3.3 Architettura comune e ottimizzazione
+Tutti i modelli sono reti neurali fully-connected (keras.Sequential) con un Input layer dimensionato sulle feature, un numero variabile di Dense hidden layer, e un singolo neurone di output. L'ottimizzatore è Adam (default) e la funzione di perdita è la binary cross-entropy, coerente con la natura binaria del target. La metrica monitorata è l'accuratezza.
+4.3.4 Metriche di valutazione
+Per ogni modello vengono registrate cinque metriche:
+Train Accuracy (ultima epoca) — capacità di adattarsi ai dati visti.
+Validation Accuracy (ultima epoca) — capacità di generalizzare su dati non visti durante l'aggiornamento dei pesi.
+Test Accuracy — metrica principale di confronto, calcolata su dati mai esposti al modello.
+Test Loss — binary cross-entropy sul test set, complementare all'accuratezza.
+Overfit Gap = Train Accuracy − Validation Accuracy — proxy del livello di overfitting.
+
+
+4.4 Design degli esperimenti
+Anziché trattare i 34 modelli come entità indipendenti, sono stati raggruppati in sette famiglie tematiche, ciascuna delle quali isola una specifica variabile sperimentale. Questa scelta permette di leggere i risultati in chiave causale: confrontando le medie all'interno di un gruppo e tra gruppi diversi è possibile attribuire le variazioni di performance a una causa identificabile.
+
+
+
+
+4.5 Risultati
+4.5.1 Tabella riassuntiva di tutti i 34 modelli
+La tabella seguente riporta tutte le configurazioni testate. I valori numerici sono ricavati dal file risultati_modelli.csv generato dalla cella master del notebook.
+
+Nota: i Rank in [parentesi quadre] sono placeholder; vanno popolati con la classifica reale dopo l'esecuzione. Architetture marcate con (RELU!), (SELU!), (TANH!), (ELU!), (GELU!) sull'output sono deliberatamente non standard per una classificazione binaria — la loss binary_crossentropy assume infatti un output in [0,1].
+
+
+
+
+
+
+
+
+
+4.6. Analisi per gruppi
+4.6.1 Gruppo A — Baseline e funzioni di attivazione (Modelli 1–8)
+Il gruppo A funge da baseline: tutti i modelli hanno un solo hidden layer da 20 neuroni e differiscono solo per funzione di attivazione (ReLU vs Sigmoid), epoche (100 o 150-200) e batch size (8, 16 o 32). L'obiettivo è stabilire un livello di riferimento e capire se ReLU o Sigmoid funzioni meglio su un hidden layer singolo con dati non standardizzati.
+Risultati. L'accuratezza media nel gruppo A è 81.99%, con una dispersione bassa. I modelli con ReLU tendono a equivalere quelli con Sigmoid sullo stesso setup, coerentemente con la maggiore semplicità del gradiente di ReLU. L'aumento del batch size da 16 a 32 (Modello 8) ha effetto negativo di qualche punto percentuale, mentre la riduzione a 8 (Modelli 4, 6) migliora la stabilità per il modello 4 risultando il secondo migliore modello del gruppo, mentre diminuisce la stabilità per il modello 6.
+4.6.2 Gruppo B — Effetto della profondità (Modelli 9–11)
+I modelli 9, 10, 11 aggiungono un secondo hidden layer da 20 neuroni con varie combinazioni di attivazioni. L'idea è verificare se più capacità rappresentazionale si traduce in più accuratezza.
+Risultati. Il passaggio da 1 a 2 hidden layer non ha portato un miglioramento netto rispetto al gruppo A. Il modello 10 (relu+sigmoid) ottiene 78.57% il modello 9 (relu+relu) 75% il modello 11 (relu+relu) non che copia del modello 9 ma con 50 epoch in più raggiunge 84.52% diventando il terzo migliore tra gruppo A e B.
+4.6.3 Gruppo C — Iperparametri di training (Modelli 12–16)
+Tenendo fissa l'architettura a 2 hidden layer ReLU, si variano epoche (100, 150, 200) e batch size (8,
+16, 32). L'obiettivo è osservare come questi due iperparametri influenzino la convergenza e la stabilità.
+Risultati. Un aumento delle epoche oltre 100-150 produce guadagni marginali. Il batch size ottimale in questo gruppo è 32. Batch piccoli (16) rendono il training più rumoroso ma a volte aiutano la generalizzazione; batch grandi (32) accelerano l'epoca ma possono convergere a minimi migliori.
+4.6.4 Gruppo D — Reti profonde e ruolo dell'output (Modelli 17–20)
+Questo gruppo include architetture con 4-8 hidden layer e contiene un caso didatticamente importante: il Modello 17 utilizza ReLU come funzione di attivazione dello strato di output. Poiché la loss adottata è binary_crossentropy, che assume un output interpretabile come probabilità in [0,1], l'uso di ReLU sull'output è formalmente scorretto e ci aspettiamo prestazioni degradate.
+Risultati. Il Modello 17 ottiene 39.29% — il peggiore della classifica, confermando l'importanza della coerenza tra attivazione di output e funzione di perdita. Il Modello 18 (8 layer ReLU consecutivi) si è comportato sorprendentemente bene mentre il Modello 20, che è in pratica una baseline a singolo layer ripetuta come controllo, fornisce un riferimento utile per misurare quanto i layer aggiuntivi degli altri modelli del gruppo abbiano effettivamente aggiunto valore.
+4.6.5 Gruppo E — Effetto della standardizzazione (Modelli 21–24)
+È il gruppo più informativo dal punto di vista metodologico. Le stesse architetture vengono ora addestrate su feature standardizzate (z-score). L'aspettativa, derivante dalla teoria, è un miglioramento netto: le reti neurali, e in particolare Adam, lavorano molto meglio quando le feature hanno scale comparabili.
+Risultati. La differenza è netta . L'accuratezza media del gruppo E è 86.61% contro 81.99% del gruppo A su architetture comparabili. Il delta è di circa 5 punti percentuale, e questo conferma che la standardizzazione è la singola modifica con il maggior ROI in questo problema.
+4.6.6 Gruppo F — Funzioni di attivazione avanzate (Modelli 25–31)
+Vengono testate funzioni di attivazione meno comuni (SELU, tanh, ELU, GELU, softplus) e combinazioni miste. Alcuni modelli (26, 28, 29, 31) usano deliberatamente funzioni non-sigmoid sull'output, replicando l'errore del Modello 17 per verificare che il pattern sia generalizzabile.
+Risultati. I modelli con output non-sigmoid (26, 28, 29, 31) mostrano dei risultati molto positivi, il gruppo ha una media di accuratezza del 87.93% risultando il gruppo con la media più alta. Tra i modelli con output non-sigmoid, il modello 26 emerge come miglior performer di gruppo e risulta per giunta il modello Champion. SELU mostra un comportamento stabile, anche grazie alle sue proprietà selfnormalizing che ben si combinano con feature standardizzate.
+4.6.7 Gruppo G — Architetture finali (Modelli 32–34)
+Il gruppo G unisce le lezioni dei precedenti: feature standardizzate, profondità moderata, attivazioni miste. Il Modello 34 testa anche un batch size molto grande (512) per valutare l'effetto sul tempo di training.
+Risultati. Il Modello 32 85.71% rappresenta il caso d'uso più realistico: profondità 3, dati standardizzati, batch size 64. Il Modello 33 conferma nuovamente che tanh sull'output degrada il modello. Il Modello 34, con batch=512, converge più velocemente evidenziando il trade-off tra velocità e qualità.
+
+
+
+4.7 Modello Champion
+Il modello con la migliore Test Accuracy è il Modello 26, appartenente al gruppo F.
+
+4.7.1 Perché ha vinto
+Il successo del Champion è attribuibile alla combinazione coerente di tre fattori, ciascuno dei quali è stato isolato e validato nell'analisi per gruppi:
+Feature standardizzate (gruppo E vs gruppo A): preprocessing che permette ad Adam di lavorare in modo bilanciato su tutte le feature.
+Profondità moderata (1 hidden layer, non 8): capacità sufficiente senza overfitting, come confermato dal confronto B vs D.
+Attivazione di output selu è risultata la funzione con il miglior risultato di accuratezza.
+4.7.2 Curve di apprendimento e confusion matrix
+Le curve accuracy e loss del Champion mostrano  convergenza rapida nelle prime 200 epoche con successivi picchi a ribasso, ma una ripresa che risulta dopo tutto lineare e coerente . La matrice di confusione sul test set evidenzia 2 falsi positivi e 4 falsi negativi su 84 campioni totali, con precisione 92% e recall 90%.
+
+
+4.8 Modello peggiore e analisi degli errori
+Il modello con la peggior Test Accuracy è Modello 17. Un'analisi dell'errore è didatticamente utile quanto quella del successo, perché permette di consolidare regole pratiche.
+Le cause principali del fallimento sono attribuibili a uno o più dei seguenti pattern:
+Output non probabilistico: uso di ReLU, tanh, SELU, ELU o GELU sull'unico neurone di output, in combinazione con binary_crossentropy. La loss attesa è negativa solo se l'output è in [0,1] (sigmoid) o calcolato con from_logits=True.
+Profondità eccessiva senza normalizzazione: reti con 8 layer ReLU senza batch normalization né residual connection rischiano vanishing gradient su dataset di queste dimensioni.
+Architetture a collo di bottiglia: modelli che iniziano con pochi neuroni (es. 2 in Modello 2223) possono perdere informazione prima ancora di espandersi.
+4.9 Lezioni apprese e linee guida
+L'esperimento, pur condotto su un singolo dataset, restituisce un insieme di linee guida che generalizzano bene a problemi di classificazione binaria tabulare con reti fully-connected:
+1. Standardizza sempre. Per dati tabulari numerici con scale eterogenee, la standardizzazione è il primo intervento da fare; nel nostro caso ha prodotto un guadagno sull'accuratezza.
+2. Coerenza output–loss. Con binary_crossentropy l'output deve essere sigmoid (oppure linear con from_logits=True). I modelli che violano questa regola occupano sistematicamente le ultime posizioni.
+3. Profondità moderata. Su problemi tabulari con poche feature, 1-3 hidden layer sono sufficienti. Reti più profonde non migliorano e introducono instabilità.
+4. Batch size 16-64. Batch troppo piccoli (8) rallentano la convergenza con guadagno minimo; batch troppo grandi (512) sacrificano la qualità del minimo.
+5. ReLU resta una scelta solida. Le attivazioni alternative (SELU, GELU, ELU) brillano in contesti specifici, ma su questo dataset ReLU rimane competitiva con il vantaggio della semplicità.
+6. Monitora l'overfit gap. Train Accuracy alta con Val Accuracy bassa è un segnale chiaro per ridurre la capacità o aggiungere regolarizzazione (dropout, early stopping), strumenti che rappresentano il naturale passo successivo a questo lavoro.
+4.10 Limiti e lavori futuri
+Il presente studio adotta un'esplorazione manuale e non esaustiva dello spazio degli iperparametri. Inoltre la metrica primaria è la sola accuratezza, che può essere fuorviante in presenza di classi sbilanciate. Le direzioni naturali di estensione sono:
+Introduzione di tecniche di regolarizzazione (dropout, L2) ed early stopping per ridurre l'overfit gap dei modelli più capaci.
+Ricerca sistematica degli iperparametri tramite Keras Tuner o Optuna, in alternativa alla griglia manuale.
+Valutazione tramite k-fold cross-validation per ottenere stime di accuratezza più robuste rispetto alla variabilità dello split.
+Estensione dell'analisi a metriche complementari (precision, recall, F1, ROC-AUC) e ispezione delle confusion matrix dei modelli a pari livello di accuratezza.
+Confronto con baseline classici (regressione logistica, random forest, gradient boosting) per verificare che la complessità della rete neurale sia effettivamente giustificata su questo dataset.
+Appendice A — Riproducibilità
+Tutti gli esperimenti sono stati eseguiti in ambiente Google Colab con TensorFlow / Keras. Lo split del dataset è governato da random_state=42 con stratificazione su Y. La cella master di training (riportata nel notebook) automatizza l'esecuzione sequenziale dei 34 modelli e produce due file CSV — risultati_modelli.csv e statistiche_per_gruppo.csv — che costituiscono la fonte numerica di tutte le tabelle e dei valori della presente relazione.
+Nota: i file csv come risultati_modelli sono stati creati direttamente nel file Google Colab, e dallo stesso è possibile scaricarli

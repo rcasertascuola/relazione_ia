@@ -1,0 +1,96 @@
+9
+Colonne categoriche
+piattaforma_preferita_label
+tipo_contenuti_label
+modalita_visione_label
+Colonne numeriche
+ore_settimanali_streaming
+numero_abbonamenti
+durata_media_visione
+film_visti_settimana
+serie_vistate_mese
+giorni_uso_settimanale
+piattaforma_preferita
+tipo_contenuti
+modalita_visione
+piattaforma_preferita_label 		tipo_contenuti_label 		modalita_visione_label
+Now 	 	Film 	 	Solo
+Disney+ 	 	Documentari 	 	Con amici
+Apple TV+ 	 	Serie TV 	 	In famiglia
+Netflix 	 	Reality 	 	In coppia
+Prime Video
+piattaforma_preferita_label 	piattaforma_preferita
+tipo_contenuti_label 	tipo_contenuti
+modalita_visione_label 	modalita_visione
+Netflix 	0
+Prime Video 	1
+Disney+ 	2
+Now 	3
+Apple TV+ 	4
+Piattaforma 	Tipologia 	Percentuale sul totale
+Netflix 	Serie TV 	61.18%
+Prime Video 	Film 	55.2%
+Disney+ 	Documentari 	46.82%
+Now 	Documentari 	52.89%
+Apple TV+ 	Reality 	55.64%
+Gruppo 	Variabile sperimentale isolata 	Modelli 		Standardizzato
+A — Baseline 	ReLU vs Sigmoid su singolo hidden layer, batch size e epoche di base 	1 – 8 	No
+B — Profondità 	Effetto dell'aggiunta di un secondo hidden layer 	9 – 11 	No
+C —
+Iperparametri 	Variazione di epoche (100–200) e batch size
+(8–32) su architettura fissa a 2 layer 	12 – 16 	No
+D — Reti profonde 	Architetture con 4–8 hidden layer; include il Modello 17 con ReLU sull'output 	17 – 20 	No
+E —
+Standardizzazione 	Stesse architetture del gruppo A/B applicate a feature z-score 	21 – 24 	Sì
+F — Attivazioni avanzate 	SELU, tanh, ELU, GELU, softplus; alcuni modelli usano attivazioni non-standard sull'output 	25 – 31 	Sì
+G — Architetture
+finali 	Combinazioni miste di tutti gli ingredienti precedenti 	32 – 34 	Sì
+Rank 	Modello 	Gruppo 	Architettura (hidden) 	Ep. 	Batch 	Std 	Test Acc 	Test Loss
+[1] 	Modello 1 	A_Baseline 	20(relu) → 1(sigmoid) 	100 	16 	No 	79,76% 	0,4138
+[2] 	Modello 2 	A_Baseline 	20(sigmoid) → 1(sigmoid) 	100 	16 	No 	82,14% 	0,33
+[3] 	Modello 3 	A_Baseline 	20(relu) → 1(sigmoid) 	150 	16 	No 	82,14% 	0,3354
+[4] 	Modello 4 	A_Baseline 	20(relu) → 1(sigmoid) 	100 	8 	No 	86,90% 	0,3338
+[5] 	Modello 5 	A_Baseline 	20(sigmoid) → 1(sigmoid) 	100 	8 	No 	88,10% 	0,2926
+[6] 	Modello 6 	A_Baseline 	20(sigmoid) → 1(sigmoid) 	150 	16 	No 	78,57% 	0,3661
+[7] 	Modello 7 	A_Baseline 	20(relu) → 1(sigmoid) 	200 	16 	No 	79,76% 	0,3844
+[8] 	Modello 8 	A_Baseline 	20(relu) → 1(sigmoid) 	100 	32 	No 	78,57% 	0,3585
+[9] 	Modello 9 	B_Profondità 	20(relu)→20(relu) → 1(sigmoid) 	100 	16 	No 	75,00% 	0,5027
+[10] 	Modello 10 	B_Profondità 	20(relu)→20(sigmoid) → 1(sigmoid) 	100 	16 	No 	78,57% 	0,3842
+[11] 	Modello 11 	B_Profondità 	20(relu)→20(relu) → 1(sigmoid) 	100 	16 	No 	84,52% 	0,3223
+[12] 	Modello 12 	C_Iperparam 	20(relu)→20(relu) → 1(sigmoid) 	150 	16 	No 	78,57% 	0,371
+[13] 	Modello 13 	C_Iperparam 	20(relu)→20(relu) → 1(sigmoid) 	100 	8 	No 	78,57% 	0,4154
+[14] 	Modello 14 	C_Iperparam 	20(relu)→20(relu) → 1(sigmoid) 	100 	32 	No 	83,33% 	0,3566
+[15] 	Modello 15 	C_Iperparam 	20(relu)→20(relu) → 1(sigmoid) 	200 	32 	No 	80,95% 	0,3715
+[16] 	Modello 16 	C_Iperparam 	20(relu)→20(relu) → 1(sigmoid) 	100 	16 	No 	83,33% 	0,3197
+[17] 	Modello 17 	D_Profonde 	20(relu)→15(sig)→10(relu)→5(relu)
+→ 1(RELU!) 	100 	16 	No 	39,29% 	9,786
+[18] 	Modello 18 	D_Profonde 	8 × 20(relu) → 1(sigmoid) 	100 	16 	No 	83,33% 	0,4053
+[19] 	Modello 19 	D_Profonde 	8 layer relu/sigmoid alternati →
+1(sigmoid) 	100 	16 	No 	84,52% 	0,7574
+[20] 	Modello 20 	D_Profonde 	20(relu) → 1(sigmoid) 	100 	16 	No 	82,14% 	0,3538
+Rank 	Modello 	Gruppo 	Architettura (hidden) 	Ep. 	Batch 	Std 	Test Acc 	Test Loss
+[21] 	Modello 21 	E_Standardizz 	25(relu) → 1(sigmoid) 	100 	16 	Sì 	89,29% 	0,3286
+[22] 	Modello 22 	E_Standardizz 	2(sig)→27(sig)→28(sig) →
+1(sigmoid) 	100 	16 	Sì 	85,71% 	0,3096
+[23] 	Modello 23 	E_Standardizz 	2(sig)→27(sig)→28(sig) →
+1(sigmoid) 	500 	16 	Sì 	88,10% 	0,3089
+[24] 	Modello 24 	E_Standardizz 	20(relu)→10(sig)→10(sig)→10(selu)
+→ 1(sig) 	100 	16 	Sì 	83,33% 	0,5287
+[25] 	Modello 25 	F_AttivAvanz 	20(selu) → 1(sigmoid) 	500 	16 	Sì 	90,48% 	0,3616
+[26] 	Modello 26 	F_AttivAvanz 	20(selu) → 1(SELU!) 	1000 	16 	Sì 	92,86% 	0,7061
+[27] 	Modello 27 	F_AttivAvanz 	30(tanh) → 1(sigmoid) 	150 	16 	Sì 	89,29% 	0,3546
+[28] 	Modello 28 	F_AttivAvanz 	30(selu) → 1(TANH!) 	150 	16 	Sì 	85,71% 	0,7487
+[29] 	Modello 29 	F_AttivAvanz 	20(relu)→20(selu) → 1(ELU!) 	200 	16 	Sì 	88,10% 	0,7008
+[30] 	Modello 30 	F_AttivAvanz 	5(softplus) → 1(sigmoid) 	200 	16 	Sì 	86,90% 	0,3575
+[31] 	Modello 31 	F_AttivAvanz 	2(soft)→4(elu)→6(tanh) →
+1(GELU!) 	100 	16 	Sì 	82,14% 	0,4272
+[32] 	Modello 32 	G_Finali 	20(relu)→15(sig)→10(relu) →
+1(sigmoid) 	150 	64 	Sì 	85,71% 	0,3935
+[33] 	Modello 33 	G_Finali 	20(relu)→15(sig)→10(elu)→5(selu)
+→ 1(TANH!) 	300 	8 	Sì 	86,90% 	1,1549
+[34] 	Modello 34 	G_Finali 	20(relu)→10(relu) → 1(sigmoid) 	150 	512 	Sì 	88,10% 	0,3658
+Architettura 	20(selu) - 1(selu)
+Epoche / Batch size 	1000 / 16
+Standardizzazione 	Sì
+Test Accuracy 	92.86%
+Test Loss 	0,7061
